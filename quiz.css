@@ -1,0 +1,201 @@
+/* bloom · Quiz "¿Cuál es tu bloom?"
+   Estética minimalista: cielo azul, tipografía enorme vs. micro textos, todo en blanco. */
+
+:root {
+  --blue-top: #2c6cdf;
+  --blue-mid: #5b97ee;
+  --blue-low: #a9c9f7;
+  --ink: #ffffff;
+  --display: "Anton", "Impact", sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { min-height: 100%; }
+button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--ink);
+  font-family: var(--body);
+  overflow-x: hidden;
+  background: var(--blue-mid);
+}
+
+/* el cielo va en una capa fija propia: funciona también en iPhone (Safari ignora background-attachment: fixed) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* cielo: azul intenso arriba que se aclara + nubes difusas */
+  background:
+    radial-gradient(ellipse 60% 18% at 22% 78%, rgba(255,255,255,.55), transparent 70%),
+    radial-gradient(ellipse 50% 14% at 80% 62%, rgba(255,255,255,.35), transparent 70%),
+    radial-gradient(ellipse 70% 16% at 55% 92%, rgba(255,255,255,.6), transparent 70%),
+    linear-gradient(180deg, var(--blue-top) 0%, var(--blue-mid) 55%, var(--blue-low) 100%);
+}
+
+/* ---------- encabezado y progreso ---------- */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(22px + env(safe-area-inset-top)) max(clamp(20px, 5vw, 48px), env(safe-area-inset-right)) 0 max(clamp(20px, 5vw, 48px), env(safe-area-inset-left));
+}
+.logo { width: 92px; height: auto; display: block; }
+.mini {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.progress { height: 2px; margin: 18px clamp(20px, 5vw, 48px) 0; background: rgba(255,255,255,.3); }
+.progress i { display: block; height: 100%; width: 0; background: #fff; transition: width .5s ease; }
+
+main { max-width: 1000px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
+
+/* ---------- pantallas ---------- */
+.screen { display: none; min-height: calc(100vh - 100px); min-height: calc(100dvh - 100px); padding: 40px 0 calc(56px + env(safe-area-inset-bottom)); }
+.screen.is-active { display: flex; flex-direction: column; justify-content: center; animation: entrar .6s ease both; }
+@keyframes entrar { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* ---------- inicio ---------- */
+.giant {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.92;
+  font-size: clamp(3.6rem, 17vw, 9rem);
+  margin: 18px 0 40px;
+}
+
+.pill {
+  align-self: flex-start;
+  font-family: var(--body);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: transparent;
+  border: 1.5px solid #fff;
+  border-radius: 999px;
+  padding: 16px 34px;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.pill:focus-visible { background: #fff; color: var(--blue-top); outline: none; }
+.pill:active { background: #fff; color: var(--blue-top); }
+.pill.solid { background: #fff; color: var(--blue-top); }
+.pill.solid:active, .pill.solid:focus-visible { background: transparent; color: #fff; }
+@media (hover: hover) {
+  .pill:hover { background: #fff; color: var(--blue-top); }
+  .pill.solid:hover { background: transparent; color: #fff; }
+}
+
+/* ---------- preguntas ---------- */
+.question {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.98;
+  font-size: clamp(2.6rem, 10vw, 5.5rem);
+  margin-bottom: 40px;
+}
+.answers { display: grid; border-top: 1.5px solid rgba(255,255,255,.55); }
+.answer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  font-family: var(--body);
+  font-size: clamp(0.95rem, 3.6vw, 1.35rem);
+  font-weight: 400;
+  text-align: left;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid rgba(255,255,255,.55);
+  padding: 22px 6px;
+  min-height: 64px;
+  cursor: pointer;
+  animation: entrar .5s ease both;
+  transition: background .2s, color .2s, padding .2s;
+}
+.answer em { font-style: normal; opacity: 0; transform: translateX(-8px); transition: .2s; }
+.answer:focus-visible { background: #fff; color: var(--blue-top); padding-left: 18px; outline: none; }
+.answer:focus-visible em { opacity: 1; transform: none; }
+@media (hover: hover) {
+  .answer:hover { background: #fff; color: var(--blue-top); padding-left: 18px; }
+  .answer:hover em { opacity: 1; transform: none; }
+}
+.answer.picked { background: #fff; color: var(--blue-top); padding-left: 18px; }
+.answer.picked em { opacity: 1; transform: none; }
+
+/* ---------- resultado ---------- */
+.result { align-items: center; text-align: center; justify-content: flex-start; padding-top: 12px; }
+.stage { position: relative; width: 100%; display: grid; place-items: center; margin-top: 8px; }
+.bigword {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1;
+  font-size: clamp(4rem, 22vw, 14rem);
+  color: rgba(255,255,255,.92);
+  white-space: nowrap;
+}
+.bottle {
+  position: relative;
+  width: clamp(170px, 40vw, 300px);
+  height: auto;
+  margin: clamp(80px, 17vw, 170px) 0 -90px;
+  -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, #000 82%, transparent);
+  animation: flota 3.2s ease-in-out infinite;
+}
+@keyframes flota { 50% { transform: translateY(-10px); } }
+
+.benefit { font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; font-size: 0.78rem; margin-top: 8px; }
+.benefit, .why, .ing { position: relative; z-index: 1; }
+.why { font-family: var(--display); text-transform: uppercase; font-size: clamp(1.6rem, 6vw, 2.8rem); line-height: 1.05; margin-top: 18px; max-width: 700px; }
+.ing { margin-top: 18px; opacity: .85; letter-spacing: 0.14em; max-width: 520px; line-height: 1.8; }
+
+.match { width: 100%; max-width: 420px; margin-top: 34px; display: grid; gap: 12px; }
+.m-row { display: grid; grid-template-columns: 70px 1fr 38px; gap: 14px; align-items: center; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; text-align: left; }
+.m-row span:last-child { text-align: right; }
+.m-bar { height: 2px; background: rgba(255,255,255,.35); }
+.m-bar i { display: block; height: 100%; background: #fff; }
+
+.note { margin-top: 38px; line-height: 2; opacity: .9; }
+.actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 22px; }
+.actions .pill { align-self: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- celulares chicos y horizontal ---------- */
+@media (max-width: 380px) {
+  .logo { width: 78px; }
+  .answer { padding: 18px 4px; }
+  .pill { padding: 15px 26px; }
+  .actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .actions .pill { text-align: center; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .screen { padding: 20px 0 32px; }
+  .giant { font-size: clamp(2.6rem, 11vw, 5rem); margin: 8px 0 20px; }
+  .question { font-size: clamp(2rem, 7vw, 3.4rem); margin-bottom: 18px; }
+  .answer { padding: 14px 6px; min-height: 52px; }
+  .bottle { width: 130px; margin: 14px 0; }
+}
